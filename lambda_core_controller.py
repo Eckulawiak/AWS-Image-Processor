@@ -89,12 +89,15 @@ def resize_image(image_bytes: bytes) -> bytes:
     """
     with Image.open(io.BytesIO(image_bytes)) as img:
         img = img.convert("RGB")
-        img.thumbnail(TARGET_SIZE, Image.LANCZOS)
- 
+        target_w, target_h = TARGET_SIZE
+        scale = min(target_w / img.width, target_h / img.height)
+        new_w = int(img.width * scale)
+        new_h = int(img.height * scale)
+        img = img.resize((new_w, new_h), Image.LANCZOS)
         canvas = Image.new("RGB", TARGET_SIZE, (0, 0, 0))
         offset = (
-            (TARGET_SIZE[0] - img.width) // 2,
-            (TARGET_SIZE[1] - img.height) // 2,
+            (target_w - new_w) // 2,
+            (target_h - new_h) // 2,
         )
         canvas.paste(img, offset)
  
